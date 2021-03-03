@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+<rdf:Description rdf:about="https://mobi.com/ontologies/3/2021/A">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+	<title xmlns="http://purl.org/dc/terms/">a</title>
+</rdf:Description>
+
+<rdf:Description rdf:about="https://mobi.com/ontologies/3/2021/A#A">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<title xmlns="http://purl.org/dc/terms/">a</title>
+</rdf:Description>
+
+<rdf:Description rdf:about="https://mobi.com/ontologies/3/2021/A#Adf">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdf:type rdf:resource="https://mobi.com/ontologies/3/2021/A#A"/>
+	<prop xmlns="https://mobi.com/ontologies/3/2021/A#" rdf:datatype="http://www.w3.org/2001/XMLSchema#double">32412341.12312</prop>
+</rdf:Description>
+
+<rdf:Description rdf:about="https://mobi.com/ontologies/3/2021/A#prop">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+	<range xmlns="http://www.w3.org/2000/01/rdf-schema#" rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+	<domain xmlns="http://www.w3.org/2000/01/rdf-schema#" rdf:resource="https://mobi.com/ontologies/3/2021/A#A"/>
+	<title xmlns="http://purl.org/dc/terms/">prop</title>
+	<description xmlns="http://purl.org/dc/terms/">adfs</description>
+</rdf:Description>
+
+</rdf:RDF>
