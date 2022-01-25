@@ -1,2 +1,10 @@
-<http://www.w3.org/2002/07/owl#Class> a <http://www.w3.org/2002/07/owl#Class>;
-  <http://www.w3.org/2000/01/rdf-schema#comment> "The class of OWL classes." .
+@prefix : <http://test.com/ontology> .
+
+:Class1 rdf:type owl:Class .
+
+:Individual1 rdf:type owl:NamedIndividual ,
+                       :Class1 .
+
+:Class2 a owl:Class .
+
+:Individual2 a :Class1, :Class2 .
