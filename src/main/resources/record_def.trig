@@ -1,0 +1,13 @@
+<https://mobi.com/records#8b2ed314-e46b-46f0-aa68-f2e0fa2ea309> {
+  <https://mobi.com/records#8b2ed314-e46b-46f0-aa68-f2e0fa2ea309> a <http://www.w3.org/2002/07/owl#Thing>,
+      <http://mobi.com/ontologies/ontology-editor#OntologyRecord>, <http://mobi.com/ontologies/catalog#VersionedRecord>,
+      <http://mobi.com/ontologies/catalog#VersionedRDFRecord>, <http://mobi.com/ontologies/catalog#Record>;
+    <http://purl.org/dc/terms/title> "asdf";
+    <http://purl.org/dc/terms/issued> "2022-04-11T13:11:15.855-06:00"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
+    <http://purl.org/dc/terms/modified> "2022-04-11T13:11:15.88-06:00"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
+    <http://mobi.com/ontologies/catalog#catalog> <http://mobi.com/catalog-local>;
+    <http://purl.org/dc/terms/publisher> <http://mobi.com/users/d033e22ae348aeb5660fc2140aec35850c4da997>;
+    <http://mobi.com/ontologies/catalog#masterBranch> <https://mobi.com/branches#da70d831-1f1e-4d80-a0eb-f65f6da140a7>;
+    <http://mobi.com/ontologies/catalog#branch> <https://mobi.com/branches#da70d831-1f1e-4d80-a0eb-f65f6da140a7>;
+    <http://mobi.com/ontologies/ontology-editor#ontologyIRI> <https://mobi.com/ontologies/qwerty> .
+}
