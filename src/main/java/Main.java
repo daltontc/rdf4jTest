@@ -1,64 +1,91 @@
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.model.Resource;
-import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
-import org.eclipse.rdf4j.query.QueryResults;
+import org.eclipse.rdf4j.query.Binding;
+import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.query.TupleQuery;
+import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import org.eclipse.rdf4j.sail.nativerdf.NativeStore;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
 
 public class Main {
     static ValueFactory vf = SimpleValueFactory.getInstance();
-    static IRI recordId = vf.createIRI("https://mobi.com/records#someRecord");
 
     public static void main(String[] args) throws IOException {
-        File repoDir = new File("target/datadir/" + UUID.randomUUID());
-        NativeStore nativeStore = new NativeStore();
-        MemoryStore memoryStore = new MemoryStore();
-        Repository repo = new SailRepository(memoryStore);
-
-        InputStream stream = Main.class.getResourceAsStream("/record_def_original.trig");
-        try (RepositoryConnection conn = repo.getConnection()) {
-            conn.add(stream, RDFFormat.TRIG);
-            RepositoryResult<Statement> stmts = conn.getStatements(recordId, null, null);
-            Model model = QueryResults.asModel(stmts);
-            stmts.close();
-            System.out.println(model.size());
+        IRI context = vf.createIRI("https://test.com/context");
+        Path path = Paths.get("target/test");
+        if (Files.exists(path)) {
+            System.out.println("Deleting old repo");
+            FileUtils.deleteDirectory(path.toFile());
         }
 
+        NativeStore store = new NativeStore();
+        store.setTripleIndexes("spoc,posc,cspo,opsc");
+        store.setDataDir(path.toFile());
+        Repository repo = new SailRepository(store);
+        repo.init();
         try (RepositoryConnection conn = repo.getConnection()) {
-            conn.begin(); // Occurs with any transaction level > NONE
-            conn.remove((Resource) null, null, null, recordId);
-            // Clear produces the same result
-            // conn.clear(recordId);
-            conn.add(Rio.parse(Main.class.getResourceAsStream("/record_def_change.trig"), RDFFormat.TRIG));
-
-            // Retrieval by graph provides expected result
-            // RepositoryResult<Statement> stmts = conn.getStatements(null, null, null, recordId);
-            RepositoryResult<Statement> stmts = conn.getStatements(recordId, null, null);
-            Model model = QueryResults.asModel(stmts);
-            System.out.println(model.size());
-            stmts.close();
-            conn.commit(); // Same behavior if moved below last retrieval
-
-            RepositoryResult<Statement> recordGraph = conn.getStatements(null, null, null, recordId);
-            Model resultFinal = QueryResults.asModel(recordGraph);
-            recordGraph.close();
-            System.out.println(resultFinal.size());
+            System.out.println("Loading in data");
+            InputStream is = Main.class.getResourceAsStream("/test.trig");
+            Model model = Rio.parse(is, "", RDFFormat.TRIG);
+            conn.add(model);
+            System.out.println("Loading in data COMPLETE");
         }
-
-        repoDir.delete();
+        try (RepositoryConnection conn = repo.getConnection()) {
+            TupleQuery query = conn.prepareTupleQuery("prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                    "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                    "prefix owl: <http://www.w3.org/2002/07/owl#>\n" +
+                    "\n" +
+                    "select ?parent ?child\n" +
+                    "where {\n" +
+                    "    values ?type {owl:Class rdfs:Class}\n" +
+                    "    ?parent rdf:type ?type .\n" +
+                    "    optional {\n" +
+                    "        ?child rdfs:subClassOf ?parent ;\n" +
+                    "               rdf:type ?type .\n" +
+                    "    }\n" +
+                    "}");
+            TupleQueryResult results = query.evaluate();
+            System.out.println("Iterating over query results");
+            StopWatch watch = new StopWatch();
+            watch.start();
+            int parentCount = 0;
+            int childCount = 0;
+            while (results.hasNext()) {
+                BindingSet result = results.next();
+                Value key = Optional.ofNullable(result.getBinding("parent")).orElseThrow(
+                        () -> new RuntimeException("Parent binding must be present for hierarchy")).getValue();
+                Binding value = Optional.ofNullable(result.getBinding("child"))
+                        .orElse(Optional.ofNullable(result.getBinding("individual")).orElse(null));
+                if (value != null) {
+                    parentCount++;
+                    System.out.println(key.stringValue() + "       " + value.getValue().stringValue());
+                } else {
+                    parentCount++;
+                    childCount++;
+                    System.out.println(key.stringValue());
+                }
+            }
+            System.out.println("Iterating over query results COMPLETE");
+            System.out.println("Total query time: " + watch.getTime());
+            System.out.println("Parent Count: " + parentCount);
+            System.out.println("Child Count: " + childCount);
+        }
     }
 }

@@ -1,6 +1,0 @@
-<https://mobi.com/records#someRecord> {
-  <https://mobi.com/records#someRecord> <http://purl.org/dc/terms/title> "asdf";
-    <http://purl.org/dc/terms/issued> "2022-04-11T13:11:15.855-06:00"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
-    <http://purl.org/dc/terms/modified> "2022-04-11T13:11:15.88-06:00"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
-    <http://mobi.com/ontologies/ontology-editor#ontologyIRI> <https://mobi.com/ontologies/Asdf> .
-}
